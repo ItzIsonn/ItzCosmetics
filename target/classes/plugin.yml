@@ -1,0 +1,28 @@
+name: ItzCosmetics
+version: 1.0
+main: me.itzisonn_.itzcosmetics.ItzCosmetics
+api-version: 1.20
+author: ItzIsonn_
+
+softdepend:
+  - EssentialsX
+  - PlayerPoints
+  - PlaceholderAPI
+
+commands:
+  cosmetics: {}
+
+permissions:
+  itzcosmetics.*:
+    children:
+      itzcosmetics.cosmetics: true
+      itzcosmetics.reload: true
+      itzcosmetics.edit: true
+    default: op
+
+  itzcosmetics.cosmetics:
+    default: op
+  itzcosmetics.reload:
+    default: op
+  itzcosmetics.edit:
+    default: op

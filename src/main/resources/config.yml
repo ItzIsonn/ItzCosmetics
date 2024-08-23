@@ -1,0 +1,649 @@
+###---------------------------###
+###-------ItzCosmetics--------###
+###---------ItzIsonn_---------###
+###---------------------------###
+
+
+
+papi:
+  # Использовать ли PlaceholderAPI
+  enabled: true
+  # Выводить ли чистый текст (без форматирования) для %cosmetics_used_<type>%
+  clearNameText: false
+
+
+# Валюта, которой будут расплачиваться игроки
+# Возможные варианты: Essentials, PlayerPoints
+# Для работы плагина надо обязательно указать один из предложенных вариантов
+# Чтобы произошли изменения, надо перезагрузить сервер
+currency: PlayerPoints
+
+# Удалять ли несуществующую косметику из базы данных (работает кок оптимизация)
+# Осторожно! Если вы поменяете айди косметики, то она удалится из базы данных
+removeNonExistentCosmetics: false
+
+# Частота в тиках, с которой будут обновляться скидки (проверка на время истечения)
+salesUpdateInterval: 200
+
+
+
+# Перевод
+translation:
+  # Сообщения
+  messages:
+    noPermission: "<red>У вас нет прав!"
+    unknownCommand: "<red>Неизвестная команда!"
+    onlyPlayer: "<red>Команду может выполнять только игрок!"
+    tooManyArguments: "<red>Слишком много аргументов!"
+    notEnoughArguments: "<red>Недостаточно аргументов!"
+    reloaded: "<green>Конфиг плагина ItzCosmetics перезагружен!"
+    unknownArgument: "<red>Неизвестный аргумент! Возможные варианты: %args%"
+    unknownPlayer: "<red>Неизвестный игрок с ником %player%!"
+    unknownType: "<red>Неизвестный тип %type%!"
+    unknownRarity: "<red>Неизвестная редкость %rarity%!"
+    unknownCategory: "<red>Неизвестная категория %category%!"
+    unknownCosmetics: "<red>Неизвестная косметика с типом %type% и айди %id%!"
+    success: "<green>Успешно изменены данные игроков %players%"
+    notSuccess: "<red>Не удалось изменить данные ни одного из игроков"
+    invalidDate: "<red>Указана неверная дата окончания скидки!"
+    saleAlreadyExists: "<red>Скидка с таким айди уже существует!"
+    percentOnlyNumbers: "<red>Процент скидки должен использовать только целые числа!"
+    saleDoesNotExist: "<red>Скидки с таким айди не существует!"
+    successSale: "<green>Успешно изменены данные о скидках!"
+    saleTemplate: "<#FFB42B>%pos%. <#FFF92B>%id% <white>- <#FFF92B>%expire_date%<white>, <#FFF92B>%percent%%<white>, <#FFF92B>%cosmetics_type_raw%<white>, <#FFF92B>%cosmetics_rarity_raw%<white>, <#FFF92B>%cosmetics_category_raw%<white>, <#FFF92B>%cosmetics_id%"
+
+  # Замена плейсхолдеру %comment% (разная надпись в зависимости от количества монет/приобрели ли вы косметику)
+  comment:
+    notEnoughMoney: "<dark_red>• <red>Недостаточно монет"
+    buy: "<dark_green>• <green>Нажмите, чтобы купить"
+    use: "<dark_green>• <green>Нажмите, чтобы применить"
+    alreadyInUse: "<gold>• <yellow>Уже используется"
+
+  # Замена плейсхолдерам фильтра
+  status:
+    true: "<green>Да"
+    false: "<red>Нет"
+
+  # Замена плейсхолдеру %filter_showtype%
+  showType:
+    all: "Все"
+    onlyBought: "Только купленные"
+    onlyNotBought: "Только не купленные"
+    onlyEquipped: "Только используемые"
+    onlySale: "Только со скидкой"
+
+  # Замена плейсхолдеру %filter_sorttype%
+  sortType:
+    type: "По типу"
+    costInturn: "Сначала дешевые"
+    costInreverse: "Сначала дорогие"
+
+  # Замена плейсхолдеру %expiry_time%
+  expiryTime:
+    overYear: "%years%г. %months%мес."
+    overMonth: "%months%мес. %days%дн."
+    overDay: "%days%дн. %hours%ч."
+    overHour: "%hours%ч. %minutes%мин."
+    overMinute: "%minutes%мин."
+    other: "меньше минуты"
+
+
+
+# Типы косметики
+types:
+  # Айди
+  walk_effect:
+    # Имя
+    name: "<#7371ec>Эффект от ходьбы"
+    # Косметика по умолчанию
+    default: none
+    # Активатор
+    activator: MOVE:PLAYER
+    # Действия
+    actions:
+      # Группа по умолчанию
+      default:
+        - "RANDOM:first%50;second%50"
+      # Айди группы
+      first:
+        - "ALL*PARTICLE:[world];[x];[y];[z];{particle1};{amount};{offsetX};{offsetY};{offsetZ};{speed}"
+      second:
+        - "ALL*PARTICLE:[world];[x];[y];[z];{particle2};{amount};{offsetX};{offsetY};{offsetZ};{speed}"
+
+  pin:
+    name: "<#7371ec>Значок"
+    default: none
+    activator: PLACEHOLDER
+
+  kill_effect:
+    name: "<#7371ec>Эффект от убийства"
+    default: none
+    activator: KILL:ALL
+    actions:
+      default:
+        - "ALL*PARTICLE:[opponent_world];[opponent_x];[opponent_y];[opponent_z];{particle};{amount};{offsetX};{offsetY};{offsetZ};{speed}"
+        - "ALL*WAIT:5"
+        - "ALL*PARTICLE:[opponent_world];[opponent_x]+1;[opponent_y];[opponent_z];{particle};{amount}*5;{offsetX};{offsetY};{offsetZ};{speed}"
+        - "ALL*PARTICLE:[opponent_world];[opponent_x]-1;[opponent_y];[opponent_z];{particle};{amount}*5;{offsetX};{offsetY};{offsetZ};{speed}"
+        - "ALL*PARTICLE:[opponent_world];[opponent_x];[opponent_y];[opponent_z]+1;{particle};{amount}*5;{offsetX};{offsetY};{offsetZ};{speed}"
+        - "ALL*PARTICLE:[opponent_world];[opponent_x];[opponent_y];[opponent_z]-1;{particle};{amount}*5;{offsetX};{offsetY};{offsetZ};{speed}"
+
+  death_sound:
+    name: "<#7371ec>Звук смерти"
+    default: none
+    activator: DEATH
+    actions:
+      default:
+        - "ALL*SOUND:[player_world];[player_x];[player_y];[player_z];{sound};{volume};{pitch}"
+
+
+
+# Редкости косметики
+rarities:
+  # Айди
+  default:
+    # Стоимость
+    cost: 0
+    # Имя
+    name: "<#C2C2C2>Классический"
+  common:
+    cost: 150
+    name: "<#6FF8A8>Обычный"
+  rare:
+    cost: 325
+    name: "<#5BD3FF>Редкий"
+  epic:
+    cost: 750
+    name: "<#E368FF>Эпический"
+  legendary:
+    cost: 1500
+    name: "<#F3E060>Легендарный"
+
+
+
+# Категории косметики
+categories:
+  # Айди
+  love:
+    # Имя
+    name: "<#E43A96>Любовь"
+  mystical:
+    name: "<#815FE2>Мистика"
+
+
+
+# Косметика
+cosmetics:
+  # Айди типа
+  walk_effect:
+    # Айди косметики
+    none:
+      # Имя
+      name: "<gradient:#37FBCC:#3283FD>Отсутствует</gradient>"
+      # Предмет, используемый в меню
+      material: STRUCTURE_VOID
+      # Редкость
+      rarity: DEFAULT
+    nature:
+      name: "<gradient:#37FBCC:#3283FD>Природа</gradient>"
+      material: BLAZE_POWDER
+      rarity: EPIC
+      # Описание (опционально)
+      description:
+        - ""
+        - "Почувствуйте природу с этим эффектом,"
+        - "под вами попеременно будут появляться"
+        - "огонь и вода"
+        - ""
+      # Данные (опционально), формат ключ:значение
+      data:
+        particle1: DRIPPING_WATER
+        particle2: DRIPPING_LAVA
+        amount: 3
+        offsetX: 0.1
+        offsetY: 0.1
+        offsetZ: 0.1
+        speed: 0.01
+
+  pin:
+    none:
+      name: "<gradient:#37FBCC:#3283FD>Отсутствует</gradient>"
+      material: STRUCTURE_VOID
+      rarity: DEFAULT
+    love:
+      name: "<gradient:#37FBCC:#3283FD>Сердечко</gradient>"
+      material: REDSTONE
+      rarity: RARE
+      categories:
+        - LOVE
+      description:
+        - ""
+        - "Покажите всю свою любовь миру,"
+        - "используя значок <3"
+        - ""
+      data:
+        text: "<3"
+
+  kill_effect:
+    none:
+      name: "<gradient:#37FBCC:#3283FD>Отсутствует</gradient>"
+      material: STRUCTURE_VOID
+      rarity: DEFAULT
+    flame:
+      name: "<gradient:#37FBCC:#3283FD>Пламя</gradient>"
+      material: BLAZE_ROD
+      rarity: LEGENDARY
+      categories:
+        - MYSTICAL
+      description:
+        - ""
+        - "Смерть противника озарится"
+        - "разрастающимся пламенем"
+        - ""
+      data:
+        particle: FLAME
+        amount: 2
+        offsetX: 0.1
+        offsetY: 0.1
+        offsetZ: 0.1
+        speed: 0.01
+
+  death_sound:
+    none:
+      name: "<gradient:#37FBCC:#3283FD>Отсутствует</gradient>"
+      material: STRUCTURE_VOID
+      rarity: DEFAULT
+    explosion:
+      name: "<gradient:#37FBCC:#3283FD>Взрыв</gradient>"
+      material: GUNPOWDER
+      rarity: COMMON
+      description:
+        - ""
+        - "Взрыв испугает противника"
+        - "даже после Вашей смерти"
+        - ""
+      data:
+        sound: ENTITY_GENERIC_EXPLODE
+        volume: 1
+        pitch: 1
+
+
+
+# Стиль предметов косметики, используемых в меню
+cosmeticsStyle:
+  # Предмет будет переливаться (как зачарованный), если он применён
+  glowWhenUse: true
+
+  # Настройка отображения категорий
+  categories:
+    # Сокращение списка
+    hide:
+      # Если категорий больше, чем указанное количество, все последующие будут скрываться
+      amount: 2
+      replace: "..."
+    # Строка для косметики, у которых категории отсутствуют
+    empty: "<red>Нет"
+    # Разделить между категориями
+    separator: "<white>, "
+
+  # Шаблон предмета в меню
+  # Первая строка - название, остальные - описание предмета
+  template:
+    - ""
+    - "  » %name%  "
+    - ""
+    - "  Тип: %type%  "
+    - "  Редкость: %rarity%  "
+    - "  Категории: %categories%  "
+    - "  <dark_grey>%description%  "
+    - "  Стоимость: <gold>%cost% монет  "
+    - ""
+    - "  %comment%  "
+    - ""
+
+  # Шаблон предмета в меню со скидкой
+  saleTemplate:
+    - ""
+    - "  » %name%  "
+    - ""
+    - "  Тип: %type%  "
+    - "  Редкость: %rarity%  "
+    - "  Категории: %categories%  "
+    - "  <dark_grey>%description%  "
+    - "  Стоимость: <gold>%sale_cost% монет <gray>(<st>%cost%</st>)  "
+    - "  Скидка <green>%sale_percent%%</green> - <green>%expiry_time%  "
+    - ""
+    - "  %comment%  "
+    - ""
+
+  # Действия при нажатии на предмет (разные в зависимости от количества монет/приобрели ли вы косметику)
+  actions:
+    notEnoughMoney:
+      - "[name]*SOUND:[world];[x];[y];[z];BLOCK_ANVIL_PLACE;1;1"
+      - "[name]*MESSAGE:<red>Недостаточно монет для покупки %type% %name%"
+    buy:
+      - "[name]*SOUND:[world];[x];[y];[z];ENTITY_PLAYER_LEVELUP;1;1"
+      - "[name]*MESSAGE:<green>Вы купили %type% %name%"
+    use:
+      - "[name]*SOUND:[world];[x];[y];[z];BLOCK_LEVER_CLICK;1;1"
+      - "[name]*MESSAGE:<green>Вы применили %type% %name%"
+    alreadyInUse:
+      - "[name]*SOUND:[world];[x];[y];[z];BLOCK_LAVA_EXTINGUISH;1;1"
+
+
+
+# Меню магазина косметики
+cosmeticsMenu:
+  # Название
+  title: " » Косметика"
+  # Размер (кратен 9)
+  size: 54
+  # Слоты, в которых будут размещаться предметы косметики
+  cosmeticsSlots:
+    - 11-15
+    - 20-24
+    - 29-33
+    - 38-42
+  # Предметы, которые будут видны всегда
+  items:
+    # Айди
+    balance:
+      # Предмет
+      material: SUNFLOWER
+      # Слот(ы)
+      slots: 0
+      # Имя
+      name: ""
+      # Описание
+      lore:
+        - "  » <gradient:#71bfec:#6b5db3>Баланс</gradient>  "
+        - ""
+        - "  Текущий баланс: <#7371ec>%playerpoints_points%  "
+        - ""
+    controlPages:
+      material: COMPASS
+      # Функции (опционально), формат айди:типКлика
+      functions:
+        next_page: LEFT
+        prev_page: RIGHT
+      slots: 45
+      name: ""
+      lore:
+        - "  » <gradient:#71bfec:#6b5db3>Страницы</gradient>  "
+        - ""
+        - "  Страница: <#7371ec>%page_num%<white>/<#7371ec>%page_total%  "
+        - ""
+    filter:
+      material: MAP
+      functions:
+        menu:filter: ALL
+      slots: 53
+      name: ""
+      lore:
+        - "  » <gradient:#71bfec:#6b5db3>Фильтры</gradient>  "
+        - ""
+    dec:
+      material: BLACK_STAINED_GLASS_PANE
+      slots:
+        - 8
+        - 9
+        - 17
+        - 18
+        - 26
+        - 27
+        - 35
+        - 36
+        - 44
+
+
+
+# Меню фильтров
+filterMenu:
+  title: " » Фильтры - %page_name%"
+  size: 27
+  items:
+    controlPages:
+      material: COMPASS
+      functions:
+        next_page: LEFT
+        prev_page: RIGHT
+      slots: 18
+      name: ""
+      lore:
+        - "  » <gradient:#71bfec:#6b5db3>Страницы</gradient>  "
+        - ""
+        - "  Страница: <#7371ec>%page_num%<white>/<#7371ec>%page_total%  "
+        - ""
+    exit:
+      material: SPRUCE_DOOR
+      functions:
+        menu:cosmetics: ALL
+      slots: 26
+      name: ""
+      lore:
+        - "  » <gradient:#EF473A:#CB2D3E>Назад</gradient>  "
+        - ""
+    dec:
+      material: BLACK_STAINED_GLASS_PANE
+      slots:
+        - 0
+        - 8
+        - 9
+        - 17
+  # Страницы
+  pages:
+    # Айди страницы
+    types:
+      # Имя страницы
+      name: "Типы"
+      # Предметы, отображаемые только на этой странице
+      items:
+        typeWalkEffects:
+          material: LEATHER_BOOTS
+          functions:
+            filter:type:walk_effect:toggle: ALL
+          slots: 11
+          name: ""
+          lore:
+            - "  » <gradient:#71bfec:#6b5db3>Эффекты от ходьбы</gradient>  "
+            - ""
+            - "  Показывать: %filter_type_walk_effect%  "
+            - ""
+        typePin:
+          material: BOOK
+          functions:
+            filter:type:pin:toggle: ALL
+          slots: 12
+          name: ""
+          lore:
+            - "  » <gradient:#71bfec:#6b5db3>Значок</gradient>  "
+            - ""
+            - "  Показывать: %filter_type_pin%  "
+            - ""
+        typeKillEffect:
+          material: IRON_SWORD
+          functions:
+            filter:type:kill_effect:toggle: ALL
+          slots: 13
+          name: ""
+          lore:
+            - "  » <gradient:#71bfec:#6b5db3>Эффекты от убийства</gradient>  "
+            - ""
+            - "  Показывать: %filter_type_kill_effect%  "
+            - ""
+        typeDeathSound:
+          material: TOTEM_OF_UNDYING
+          functions:
+            filter:type:death_sound:toggle: ALL
+          slots: 14
+          name: ""
+          lore:
+            - "  » <gradient:#71bfec:#6b5db3>Звук смерти</gradient>  "
+            - ""
+            - "  Показывать: %filter_type_death_sound%  "
+            - ""
+    rarities:
+      name: "Редкости"
+      items:
+        rarityDefault:
+          material: CLAY_BALL
+          functions:
+            filter:rarity:default:toggle: ALL
+          slots: 11
+          name: ""
+          lore:
+            - "  » <gradient:#71bfec:#6b5db3>Классическая редкость</gradient>  "
+            - ""
+            - "  Показывать: %filter_rarity_default%  "
+            - ""
+        rarityCommon:
+          material: GLOW_INK_SAC
+          functions:
+            filter:rarity:common:toggle: ALL
+          slots: 12
+          name: ""
+          lore:
+            - "  » <gradient:#71bfec:#6b5db3>Обычная редкость</gradient>  "
+            - ""
+            - "  Показывать: %filter_rarity_common%  "
+            - ""
+        rarityRare:
+          material: SLIME_BALL
+          functions:
+            filter:rarity:rare:toggle: ALL
+          slots: 13
+          name: ""
+          lore:
+            - "  » <gradient:#71bfec:#6b5db3>Редкая редкость</gradient>  "
+            - ""
+            - "  Показывать: %filter_rarity_rare%  "
+            - ""
+        rarityEpic:
+          material: AMETHYST_SHARD
+          functions:
+            filter:rarity:epic:toggle: ALL
+          slots: 14
+          name: ""
+          lore:
+            - "  » <gradient:#71bfec:#6b5db3>Эпическая редкость</gradient>  "
+            - ""
+            - "  Показывать: %filter_rarity_epic%  "
+            - ""
+        rarityLegendary:
+          material: GOLD_INGOT
+          functions:
+            filter:rarity:legendary:toggle: ALL
+          slots: 15
+          name: ""
+          lore:
+            - "  » <gradient:#71bfec:#6b5db3>Легендарная редкость</gradient>  "
+            - ""
+            - "  Показывать: %filter_rarity_legendary%  "
+            - ""
+    categories:
+      name: "Категории"
+      items:
+        categoryWithout:
+          material: STRUCTURE_VOID
+          functions:
+            filter:category:without:toggle: ALL
+          slots: 11
+          name: ""
+          lore:
+            - "  » <gradient:#71bfec:#6b5db3>Без категории</gradient>  "
+            - ""
+            - "  Показывать: %filter_category_without%  "
+            - ""
+        categoryLove:
+          material: ROSE_BUSH
+          functions:
+            filter:category:love:toggle: ALL
+          slots: 12
+          name: ""
+          lore:
+            - "  » <gradient:#71bfec:#6b5db3>Категория Любовь</gradient>  "
+            - ""
+            - "  Показывать: %filter_category_love%  "
+            - ""
+        categoryMystical:
+          material: ENDER_EYE
+          functions:
+            filter:category:mystical:toggle: ALL
+          slots: 13
+          name: ""
+          lore:
+            - "  » <gradient:#71bfec:#6b5db3>Категория Мистика</gradient>  "
+            - ""
+            - "  Показывать: %filter_category_mystical%  "
+            - ""
+    extra:
+      name: "Дополнительно"
+      items:
+        showType:
+          material: ENDER_PEARL
+          functions:
+            next_showtype: LEFT
+            prev_showtype: RIGHT
+          slots: 11
+          name: ""
+          lore:
+            - "  » <gradient:#71bfec:#6b5db3>Тип отображения</gradient>  "
+            - ""
+            - "  Тип: <#7371ec>%filter_showtype%  "
+            - ""
+        sortType:
+          material: BOOK
+          functions:
+            next_sorttype: LEFT
+            prev_sorttype: RIGHT
+          slots: 12
+          name: ""
+          lore:
+            - "  » <gradient:#71bfec:#6b5db3>Тип сортировки</gradient>  "
+            - ""
+            - "  Тип: <#7371ec>%filter_sorttype%  "
+            - ""
+
+
+
+# Меню подтверждения покупки
+# Доступны плейсхолдеры покупаемой косметики
+confirmMenu:
+  # Если выключено, предмет будет сразу куплен
+  enabled: true
+
+  title: " » Подтверждение покупки"
+  size: 27
+  items:
+    confirm:
+      material: LIME_DYE
+      slots: 12
+      functions:
+        confirm: ALL
+        menu:cosmetics: ALL
+      name: ""
+      lore:
+        - "  » <gradient:#62FF80:#00FF3B>Подтвердить</gradient>  "
+        - ""
+        - "  Тип: %type%  "
+        - "  Название: %name%  "
+        - "  Стоимость: <gold>%final_cost% монет  "
+        - ""
+    cancel:
+      material: RED_DYE
+      functions:
+        menu:cosmetics: ALL
+      slots: 14
+      name: ""
+      lore:
+        - "  » <gradient:#EF473A:#CB2D3E>Отменить</gradient>  "
+        - ""
+    dec:
+      material: BLACK_STAINED_GLASS_PANE
+      slots:
+        - 0
+        - 8
+        - 9
+        - 17
+        - 18
+        - 26
