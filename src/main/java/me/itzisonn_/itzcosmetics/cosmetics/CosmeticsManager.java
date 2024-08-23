@@ -56,6 +56,36 @@ public class CosmeticsManager implements Listener {
     }
 
     @EventHandler
+    public void onKill(EntityDeathEvent e) {
+        if (e.getEntity().getKiller() == null) return;
+
+        for (Cosmetics cosmetics : plugin.getShopManager().getCosmeticsByActivatorType(ActivatorType.KILL)) {
+            if (!plugin.getShopManager().getUsed(e.getEntity().getKiller(), cosmetics.getType().getId()).equals(cosmetics)) continue;
+            if (cosmetics.getType().getActivatorArgs()[0].equalsIgnoreCase("PLAYER") && e.getEntity().getType() != EntityType.PLAYER) continue;
+            if (cosmetics.getType().getActivatorArgs()[0].equalsIgnoreCase("ENTITY") && e.getEntity().getType() == EntityType.PLAYER) continue;
+
+            HashMap<String, Entity> entities = new HashMap<>();
+            entities.put("opponent", e.getEntity());
+            entities.put("player", e.getEntity().getKiller());
+
+            parseActions(cosmetics, entities);
+        }
+    }
+
+    @EventHandler
+    public void onDeath(PlayerDeathEvent e) {
+        for (Cosmetics cosmetics : plugin.getShopManager().getCosmeticsByActivatorType(ActivatorType.DEATH)) {
+            if (!plugin.getShopManager().getUsed(e.getPlayer(), cosmetics.getType().getId()).equals(cosmetics)) continue;
+
+            HashMap<String, Entity> entities = new HashMap<>();
+            entities.put("player", e.getPlayer());
+            if (e.getPlayer().getKiller() != null) entities.put("killer", e.getPlayer().getKiller());
+
+            parseActions(cosmetics, entities);
+        }
+    }
+
+    @EventHandler
     public void onRespawn(PlayerRespawnEvent e) {
         for (Cosmetics cosmetics : plugin.getShopManager().getCosmeticsByActivatorType(ActivatorType.RESPAWN)) {
             if (!plugin.getShopManager().getUsed(e.getPlayer(), cosmetics.getType().getId()).equals(cosmetics)) continue;
@@ -64,23 +94,6 @@ public class CosmeticsManager implements Listener {
             entities.put("player", e.getPlayer());
 
             parseActions(cosmetics, entities);
-        }
-    }
-
-    public void startRepeat() {
-        for (Type type : plugin.getShopManager().getTypes()) {
-            if (type.getActivatorType() != ActivatorType.REPEAT) continue;
-
-            plugin.getTaskIds().add(Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, () -> {
-                for (Player player : Bukkit.getServer().getOnlinePlayers()) {
-                    Cosmetics cosmetics = plugin.getShopManager().getUsed(player, type.getId());
-
-                    HashMap<String, Entity> entities = new HashMap<>();
-                    entities.put("player", player);
-
-                    parseActions(cosmetics, entities);
-                }
-            }, 0, Integer.parseInt(type.getActivatorArgs()[0])));
         }
     }
 
@@ -130,6 +143,31 @@ public class CosmeticsManager implements Listener {
         }
     }
 
+    @EventHandler
+    public void onProjectileLaunch(ProjectileLaunchEvent e) {
+        if (e.getEntity().getOwnerUniqueId() == null) return;
+        Player player = Bukkit.getPlayer(e.getEntity().getOwnerUniqueId());
+        if (player == null) return;
+        projectiles.putIfAbsent(e.getEntity(), player);
+    }
+
+    public void startRepeat() {
+        for (Type type : plugin.getShopManager().getTypes()) {
+            if (type.getActivatorType() != ActivatorType.REPEAT) continue;
+
+            plugin.getTaskIds().add(Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, () -> {
+                for (Player player : Bukkit.getServer().getOnlinePlayers()) {
+                    Cosmetics cosmetics = plugin.getShopManager().getUsed(player, type.getId());
+
+                    HashMap<String, Entity> entities = new HashMap<>();
+                    entities.put("player", player);
+
+                    parseActions(cosmetics, entities);
+                }
+            }, 0, Integer.parseInt(type.getActivatorArgs()[0])));
+        }
+    }
+
     public void startPlaceholderUpdate() {
         for (Type type : plugin.getShopManager().getTypes()) {
             if (type.getActivatorType() != ActivatorType.ANIMATED_PLACEHOLDER) continue;
@@ -153,44 +191,6 @@ public class CosmeticsManager implements Listener {
         if (cosmetics.getData().get("lines") == null) return "";
 
         return toList(cosmetics.getData().get("lines")).get(animatedPlaceholders.get(cosmetics));
-    }
-
-    @EventHandler
-    public void onKill(EntityDeathEvent e) {
-        if (e.getEntity().getKiller() == null) return;
-
-        for (Cosmetics cosmetics : plugin.getShopManager().getCosmeticsByActivatorType(ActivatorType.KILL)) {
-            if (!plugin.getShopManager().getUsed(e.getEntity().getKiller(), cosmetics.getType().getId()).equals(cosmetics)) continue;
-            if (cosmetics.getType().getActivatorArgs()[0].equalsIgnoreCase("PLAYER") && e.getEntity().getType() != EntityType.PLAYER) continue;
-            if (cosmetics.getType().getActivatorArgs()[0].equalsIgnoreCase("ENTITY") && e.getEntity().getType() == EntityType.PLAYER) continue;
-
-            HashMap<String, Entity> entities = new HashMap<>();
-            entities.put("opponent", e.getEntity());
-            entities.put("player", e.getEntity().getKiller());
-
-            parseActions(cosmetics, entities);
-        }
-    }
-
-    @EventHandler
-    public void onDeath(PlayerDeathEvent e) {
-        for (Cosmetics cosmetics : plugin.getShopManager().getCosmeticsByActivatorType(ActivatorType.DEATH)) {
-            if (!plugin.getShopManager().getUsed(e.getPlayer(), cosmetics.getType().getId()).equals(cosmetics)) continue;
-
-            HashMap<String, Entity> entities = new HashMap<>();
-            entities.put("player", e.getPlayer());
-            if (e.getPlayer().getKiller() != null) entities.put("killer", e.getPlayer().getKiller());
-
-            parseActions(cosmetics, entities);
-        }
-    }
-
-    @EventHandler
-    public void onProjectileLaunch(ProjectileLaunchEvent e) {
-        if (e.getEntity().getOwnerUniqueId() == null) return;
-        Player player = Bukkit.getPlayer(e.getEntity().getOwnerUniqueId());
-        if (player == null) return;
-        projectiles.putIfAbsent(e.getEntity(), player);
     }
 
     public void onUse(Player player, Cosmetics cosmetics) {

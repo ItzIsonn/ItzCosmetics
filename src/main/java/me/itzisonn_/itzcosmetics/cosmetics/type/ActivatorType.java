@@ -12,8 +12,8 @@ public enum ActivatorType {
 
     REPEAT,
 
-    ANIMATED_PLACEHOLDER,
     PLACEHOLDER,
+    ANIMATED_PLACEHOLDER,
 
     ON_USE
 }
