@@ -95,7 +95,7 @@ types:
   walk_effect:
     # Имя
     name: "<#7371ec>Эффект от ходьбы"
-    # Косметика по умолчанию
+    # Косметика по умолчанию (обязательно)
     default: none
     # Активатор
     activator: MOVE:PLAYER

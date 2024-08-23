@@ -95,7 +95,7 @@ types:
   walk_effect:
     # Name
     name: "<#7371ec>Walk effect"
-    # Cosmetics by default
+    # Cosmetics by default (required)
     default: none
     # Activator
     activator: MOVE:PLAYER
