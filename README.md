@@ -1,3 +1,5 @@
+# Русский
+
 Плагин создан для Vanilla-like серверов, чтобы игроки выражали себя, используя уникальную косметику
 
 
@@ -20,7 +22,7 @@
 
 Мне будет приятно, если вы оставите хороший отзыв
 
-
+# English
 
 The plugin is designed for Vanilla-like servers so that players express themselves using unique cosmetics
 
