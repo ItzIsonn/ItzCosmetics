@@ -1,13 +1,11 @@
 package me.itzisonn_.itzcosmetics.cosmetics.type;
 
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 
 @Getter
-@EqualsAndHashCode
 public class Type {
     private final String id;
     private final String name;

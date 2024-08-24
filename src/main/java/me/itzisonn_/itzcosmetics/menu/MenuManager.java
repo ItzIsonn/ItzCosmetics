@@ -170,7 +170,7 @@ public class MenuManager implements Listener {
                     else if (functionId.toUpperCase().matches("^FILTER:.*:.*:.*")) {
                         String filterType = functionId.toUpperCase().split(":")[1];
                         String filterData = functionId.toUpperCase().split(":")[2];
-                        String filterAction = functionId.toUpperCase().split(":")[3].toLowerCase();
+                        String filterAction = functionId.split(":")[3].toLowerCase();
 
                         switch (filterType) {
                             case "TYPE" -> {

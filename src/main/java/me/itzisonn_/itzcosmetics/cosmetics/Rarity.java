@@ -1,10 +1,8 @@
 package me.itzisonn_.itzcosmetics.cosmetics;
 
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 
 @Getter
-@EqualsAndHashCode
 public class Rarity {
     private final String id;
     private final int cost;

@@ -1,6 +1,5 @@
 package me.itzisonn_.itzcosmetics.cosmetics;
 
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import me.itzisonn_.itzcosmetics.cosmetics.type.Type;
 import org.bukkit.Material;
@@ -9,7 +8,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 @Getter
-@EqualsAndHashCode
 public class Cosmetics {
     private final String id;
     private final String name;
