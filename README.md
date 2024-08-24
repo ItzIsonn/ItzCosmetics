@@ -10,6 +10,7 @@
 - Возможность использовать несколько действий
 - Фишки магазина: страницы, подтверждение покупки
 - Поддержка HEX цветов (Формат MiniMessage)
+- Поддержка PlaceholderAPI (использование в меню и свои плейсхолдеры)
 
 <b>Список идей:</b>
 - Поддержка MySQL ✗
@@ -34,6 +35,7 @@ The plugin is designed for Vanilla-like servers so that players express themselv
 - The ability to use multiple actions
 - Shop features: pages, purchase confirmation
 - Supports HEX colors (MiniMessage format)
+- Supports PlaceholderAPI (in menu and own placeholders)
 
 <b>Ideas:</b>
 - MySQL support ✗
