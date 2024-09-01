@@ -16,81 +16,6 @@ public class SQLiteConnector extends DatabaseManager {
         this.plugin = plugin;
     }
 
-//    @Override
-//    public ArrayList<String> getPlayers() {
-//        ArrayList<String> players = new ArrayList<>();
-//
-//        connection = getConnection();
-//
-//        try (PreparedStatement statement = connection.prepareStatement("SELECT * FROM cosmetics;")) {
-//            ResultSet resultSet = statement.executeQuery();
-//
-//            while (resultSet.next()) {
-//                players.add(resultSet.getString("player"));
-//            }
-//
-//            resultSet.close();
-//        }
-//        catch (SQLException e) {
-//            plugin.getLogger().log(Level.SEVERE, "Can't execute SQLite statement", e);
-//        }
-//        finally {
-//            closeConnection(connection);
-//        }
-//
-//        return players;
-//    }
-//
-//    @Override
-//    public HashMap<String, ArrayList<String>> getAllBought() {
-//        HashMap<String, ArrayList<String>> bought = new HashMap<>();
-//
-//        connection = getConnection();
-//
-//        try (PreparedStatement statement = connection.prepareStatement("SELECT * FROM cosmetics;")) {
-//            ResultSet resultSet = statement.executeQuery();
-//
-//            while (resultSet.next()) {
-//                bought.put(resultSet.getString("player"), new ArrayList<>(List.of(resultSet.getString("bought").split(","))));
-//            }
-//
-//            resultSet.close();
-//        }
-//        catch (SQLException e) {
-//            plugin.getLogger().log(Level.SEVERE, "Can't execute SQLite statement", e);
-//        }
-//        finally {
-//            closeConnection(connection);
-//        }
-//
-//        return bought;
-//    }
-//
-//    @Override
-//    public HashMap<String, ArrayList<String>> getAllUsed() {
-//        HashMap<String, ArrayList<String>> bought = new HashMap<>();
-//
-//        connection = getConnection();
-//
-//        try (PreparedStatement statement = connection.prepareStatement("SELECT * FROM cosmetics;")) {
-//            ResultSet resultSet = statement.executeQuery();
-//
-//            while (resultSet.next()) {
-//                bought.put(resultSet.getString("player"), new ArrayList<>(List.of(resultSet.getString("used").split(","))));
-//            }
-//
-//            resultSet.close();
-//        }
-//        catch (SQLException e) {
-//            plugin.getLogger().log(Level.SEVERE, "Can't execute SQLite statement", e);
-//        }
-//        finally {
-//            closeConnection(connection);
-//        }
-//
-//        return bought;
-//    }
-
     @Override
     public boolean hasData(String player) {
         connection = getConnection();
@@ -303,7 +228,7 @@ public class SQLiteConnector extends DatabaseManager {
                     "cosmetics_id TEXT NOT NULL);");
         }
         catch (SQLException e) {
-            plugin.getLogger().log(Level.SEVERE, "Failed to create load database", e);
+            plugin.getLogger().log(Level.SEVERE, "Failed to load database", e);
         }
         finally {
             closeConnection(connection);

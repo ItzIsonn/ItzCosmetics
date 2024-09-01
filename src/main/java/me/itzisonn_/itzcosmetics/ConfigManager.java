@@ -519,7 +519,7 @@ public class ConfigManager {
                 ItemMeta itemMeta = item.getItemMeta();
 
                 if (plugin.getShopManager().isBought(player, cosmetics) && plugin.getShopManager().getUsed(player, cosmetics.getType().getId()) == cosmetics &&
-                        config.getBoolean("glowWhenUse", true)) itemMeta.addEnchant(Enchantment.POWER, 1, false);
+                        config.getBoolean("glowWhenUse", true)) itemMeta.addEnchant(Enchantment.THORNS, 1, false);
 
                 ArrayList<String> template = new ArrayList<>(config.getStringList("cosmeticsStyle.template"));
                 if (plugin.getShopManager().getSale(cosmetics) != null) template = new ArrayList<>(config.getStringList("cosmeticsStyle.saleTemplate"));
@@ -697,7 +697,7 @@ public class ConfigManager {
                 plugin.getUtils().parsePlaceholders(plugin.getMenuManager().getPlayer(data), plugin.getUtils().parseMenuPlaceholders(data, section.getString("name", "")))));
         itemMeta.lore(convertStringList(data, section.getStringList("lore")));
 
-        if (section.getBoolean("enchanted", false)) itemMeta.addEnchant(Enchantment.FORTUNE, 1, true);
+        if (section.getBoolean("enchanted", false)) itemMeta.addEnchant(Enchantment.THORNS, 1, true);
         item.setAmount(section.getInt("amount", 1));
 
         if (section.getConfigurationSection("functions") != null) {
